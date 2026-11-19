@@ -35,14 +35,55 @@ def test_marketing_profile_is_defined_by_this_app():
 def test_marketing_profile_covers_own_and_meta_tools_and_skill_loading():
     spec = _profiles()["marketing"]
     assert {"marketing", "meta-ads", "kb"} <= set(spec["upstreams"])
+    assert "meta-ads__*" not in spec["tools_allow"]
 
     def allowed(qualified):
         return any(fnmatch.fnmatchcase(qualified, p) for p in spec["tools_allow"])
 
     assert allowed("marketing__marketing_activate_campaign")
     assert allowed("meta-ads__ads_create_campaign")
+    assert allowed("meta-ads__ads_get_ad_accounts")
     assert allowed("kb__load_skill")
     assert not allowed("kb__delete_knowledge_base")
+
+
+# Every Meta tool that can turn an entity ACTIVE or change one that already
+# exists. The gateway's approval gate covers agent/workflow RUNS, not upstream
+# tool calls, so the profile is the only enforcement: activation must go
+# through marketing_activate_campaign's human approval, and edits to budget /
+# targeting / status are a human's job in Ads Manager (prompt rule 3).
+FORBIDDEN_META = [
+    "ads_activate_entity", "ads_update_entity", "ads_duplicate_entity",
+    "ads_boost_ig_post", "ads_creative_update", "ads_creative_delete",
+    "ads_delete_custom_audience", "ads_delete_local_ad_image",
+    "ads_create_custom_audience", "ads_update_custom_audience",
+    "ads_catalog_update_product", "ads_pixel_event_create",
+    "ads_experiment_abtest_create_test", "ads_dataset_create",
+]
+
+
+def test_marketing_profile_cannot_activate_or_edit_meta_entities():
+    spec = _profiles()["marketing"]
+
+    def allowed(qualified):
+        return any(fnmatch.fnmatchcase(qualified, p) for p in spec["tools_allow"])
+
+    for tool in FORBIDDEN_META:
+        assert not allowed(f"meta-ads__{tool}"), tool
+
+
+def test_marketing_profile_allows_the_meta_tools_the_skills_use():
+    """Don't lock the flow out of its own steps: every ads_* tool the two
+    skills name is reachable, except the ones forbidden above."""
+    import re
+
+    spec = _profiles()["marketing"]
+    used = set()
+    for skill in ("aw-marketing", "aw-meta-ads"):
+        used |= set(re.findall(r"\bads_[a-z_]+", (ROOT / "skills" / skill / "SKILL.md").read_text()))
+    used -= {"ads_manager_url", "ads_mcp_management"}  # not tool names
+    for tool in sorted(used - set(FORBIDDEN_META)):
+        assert any(fnmatch.fnmatchcase(f"meta-ads__{tool}", p) for p in spec["tools_allow"]), tool
 
 
 def test_google_ads_profile_is_wired_but_owned_by_the_google_ads_app():
