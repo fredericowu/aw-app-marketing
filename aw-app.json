@@ -59,12 +59,17 @@
         {
           "slug": "agent-config-marketing",
           "name": "Marketing",
-          "description": "Tool belt for the marketing agent: this app's own deterministic tools, Meta's hosted Ads MCP, and the store app's catalog upstream. The store credential is never duplicated here \u2014 it is reached through the gateway, owned by whichever app registered that store.",
+          "description": "Tool belt for the marketing agent: this app's own deterministic tools, Meta's hosted Ads MCP, and (read-only) Google Ads through the google-ads app's own gateway profile. The store's catalog upstream is not in the generic profile \u2014 it is reached through the gateway, owned by whichever app registered that store.",
           "mcp_servers": [
             {
               "name": "marketing",
               "server": "aw-gateway",
               "profile": "marketing"
+            },
+            {
+              "name": "google-ads",
+              "server": "aw-gateway",
+              "profile": "google-ads"
             }
           ],
           "permissions": {

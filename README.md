@@ -168,12 +168,23 @@ coupon codes verbatim (so creative copy is *extracted*, never copied).
 
 ## Agent scoping — read before trusting it
 
-`agent-config-marketing` names a gateway profile restricting the agent to
-`marketing`, `meta-ads` and the store's upstream. **Today that is documentation
-of intent, not a security barrier.** This workspace's gateway ships
-`configs: {}` (`apps/mcp-gateway/back/config/gateway.json`), so profile names
-resolve to nothing and agents see the whole gateway. Treat the restriction as a
-statement of what *should* be enforced once profiles work.
+`agent-config-marketing` names two gateway profiles:
+
+* `marketing` — shipped by this app in `gateway-profiles.json`: the `marketing`
+  and `meta-ads` upstreams plus `kb`'s `load_skill`/`search_*` (the prompt loads
+  its skills through them). Until v0.10 this profile was referenced but never
+  defined anywhere, so `/mcp/marketing` answered **404** and the agent came up
+  with zero tools.
+* `google-ads` — shipped by the separate **Google Ads** app
+  (`tekflox/aw-app-google-ads`), read-only Google Ads reporting. Absent until
+  that app is installed; the entry then resolves to a 404 and contributes
+  nothing.
+
+The **store's catalog upstream is deliberately not in the generic profile** —
+its name is tenant-specific. A workspace that wants the full catalog → campaign
+flow adds it by defining a hand-authored `marketing` config in the gateway's
+profile editor (`config/gateway.json` `configs`), which overrides this app's
+profile by name.
 
 ## Develop
 
