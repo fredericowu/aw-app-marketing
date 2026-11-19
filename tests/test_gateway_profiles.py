@@ -15,7 +15,10 @@ def _manifest():
 
 
 def _profiles():
-    return json.loads((ROOT / "gateway-profiles.json").read_text())["profiles"]
+    # Declared in the manifest; the workspace runtime renders
+    # gateway-profiles.json from it on every activation and DELETES an
+    # undeclared one (aw-workspace src/apps/gateway_profiles.py).
+    return _manifest()["contributes"]["mcp"]["profiles"]
 
 
 def _servers():

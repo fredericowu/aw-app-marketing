@@ -32,6 +32,22 @@
     ],
     "mcp": {
       "reload_on_save": true,
+      "profiles": {
+        "marketing": {
+          "upstreams": [
+            "marketing",
+            "meta-ads",
+            "kb"
+          ],
+          "tools_allow": [
+            "marketing__*",
+            "meta-ads__*",
+            "kb__load_skill",
+            "kb__search_skills",
+            "kb__search_knowledge_base"
+          ]
+        }
+      },
       "provides": [
         "marketing_filter_products",
         "marketing_campaign_plan",

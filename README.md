@@ -170,7 +170,8 @@ coupon codes verbatim (so creative copy is *extracted*, never copied).
 
 `agent-config-marketing` names two gateway profiles:
 
-* `marketing` — shipped by this app in `gateway-profiles.json`: the `marketing`
+* `marketing` — declared by this app in `aw-app.json` `contributes.mcp.profiles`
+  (the runtime renders `gateway-profiles.json` from it at activation): the `marketing`
   and `meta-ads` upstreams plus `kb`'s `load_skill`/`search_*` (the prompt loads
   its skills through them). Until v0.10 this profile was referenced but never
   defined anywhere, so `/mcp/marketing` answered **404** and the agent came up
