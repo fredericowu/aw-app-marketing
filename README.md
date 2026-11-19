@@ -168,12 +168,29 @@ coupon codes verbatim (so creative copy is *extracted*, never copied).
 
 ## Agent scoping — read before trusting it
 
-`agent-config-marketing` names a gateway profile restricting the agent to
-`marketing`, `meta-ads` and the store's upstream. **Today that is documentation
-of intent, not a security barrier.** This workspace's gateway ships
-`configs: {}` (`apps/mcp-gateway/back/config/gateway.json`), so profile names
-resolve to nothing and agents see the whole gateway. Treat the restriction as a
-statement of what *should* be enforced once profiles work.
+`agent-config-marketing` names two gateway profiles:
+
+* `marketing` — declared by this app in `aw-app.json` `contributes.mcp.profiles`
+  (the runtime renders `gateway-profiles.json` from it at activation): the `marketing`
+  and `meta-ads` upstreams plus `kb`'s `load_skill`/`search_*` (the prompt loads
+  its skills through them). Until v0.10 this profile was referenced but never
+  defined anywhere, so `/mcp/marketing` answered **404** and the agent came up
+  with zero tools.
+* `google-ads` — shipped by the separate **Google Ads** app
+  (`tekflox/aw-app-google-ads`), read-only Google Ads reporting. Absent until
+  that app is installed; the entry then resolves to a 404 and contributes
+  nothing.
+
+The **store's catalog upstream is deliberately not in the generic profile** —
+its name is tenant-specific. To enable the full catalog → campaign flow, copy
+the complete `contributes.mcp.profiles.marketing` profile from `aw-app.json`
+into the gateway's `config/gateway.json` under `configs.marketing` (profile
+editor), **keep every existing `tools_allow` entry**, add the store upstream,
+and allow only the store catalog tools the flow needs (e.g.
+`<store-upstream>__get_catalog`). The gateway replaces the app's profile
+**whole** with that override, and an omitted or empty `tools_allow` means every
+tool on every listed upstream — including Meta's `ads_activate_entity`, which
+would let the agent bypass `marketing_activate_campaign`'s human approval.
 
 ## Develop
 

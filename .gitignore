@@ -73,3 +73,7 @@ mcp.json
 # see marketing_app/mcp/self_register.py for why a second writer would
 # silently erase the first one's work.
 mcp.template.json
+
+# Rendered by the workspace runtime from contributes.mcp.profiles on every
+# activation — never commit it (an undeclared one is deleted at activation).
+gateway-profiles.json

@@ -32,6 +32,34 @@
     ],
     "mcp": {
       "reload_on_save": true,
+      "profiles": {
+        "marketing": {
+          "upstreams": [
+            "marketing",
+            "meta-ads",
+            "kb"
+          ],
+          "tools_allow": [
+            "marketing__*",
+            "meta-ads__ads_get_*",
+            "meta-ads__ads_insights_*",
+            "meta-ads__ads_library_search",
+            "meta-ads__ads_account_get_activity_logs",
+            "meta-ads__ads_create_campaign",
+            "meta-ads__ads_create_ad_set",
+            "meta-ads__ads_create_creative",
+            "meta-ads__ads_create_ad",
+            "meta-ads__ads_create_upload_url",
+            "meta-ads__ads_finalize_upload",
+            "meta-ads__ads_creative_upload_media",
+            "meta-ads__ads_creative_upload_local_image",
+            "meta-ads__ads_finalize_local_ad_image_upload",
+            "kb__load_skill",
+            "kb__search_skills",
+            "kb__search_knowledge_base"
+          ]
+        }
+      },
       "provides": [
         "marketing_filter_products",
         "marketing_campaign_plan",
@@ -59,12 +87,17 @@
         {
           "slug": "agent-config-marketing",
           "name": "Marketing",
-          "description": "Tool belt for the marketing agent: this app's own deterministic tools, Meta's hosted Ads MCP, and the store app's catalog upstream. The store credential is never duplicated here \u2014 it is reached through the gateway, owned by whichever app registered that store.",
+          "description": "Tool belt for the marketing agent: this app's own deterministic tools, Meta's hosted Ads MCP, and (read-only) Google Ads through the google-ads app's own gateway profile. The store's catalog upstream is not in the generic profile \u2014 it is reached through the gateway, owned by whichever app registered that store.",
           "mcp_servers": [
             {
               "name": "marketing",
               "server": "aw-gateway",
               "profile": "marketing"
+            },
+            {
+              "name": "google-ads",
+              "server": "aw-gateway",
+              "profile": "google-ads"
             }
           ],
           "permissions": {
