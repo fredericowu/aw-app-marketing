@@ -182,10 +182,15 @@ coupon codes verbatim (so creative copy is *extracted*, never copied).
   nothing.
 
 The **store's catalog upstream is deliberately not in the generic profile** —
-its name is tenant-specific. A workspace that wants the full catalog → campaign
-flow adds it by defining a hand-authored `marketing` config in the gateway's
-profile editor (`config/gateway.json` `configs`), which overrides this app's
-profile by name.
+its name is tenant-specific. To enable the full catalog → campaign flow, copy
+the complete `contributes.mcp.profiles.marketing` profile from `aw-app.json`
+into the gateway's `config/gateway.json` under `configs.marketing` (profile
+editor), **keep every existing `tools_allow` entry**, add the store upstream,
+and allow only the store catalog tools the flow needs (e.g.
+`<store-upstream>__get_catalog`). The gateway replaces the app's profile
+**whole** with that override, and an omitted or empty `tools_allow` means every
+tool on every listed upstream — including Meta's `ads_activate_entity`, which
+would let the agent bypass `marketing_activate_campaign`'s human approval.
 
 ## Develop
 
